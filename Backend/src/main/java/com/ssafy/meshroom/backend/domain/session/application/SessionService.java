@@ -154,7 +154,7 @@ public class SessionService {
         String token = connection.getToken(); // Send this string to the client side
 
         // 4. user 컬렉션과 token 컬렉션에 관계 추가
-        if(!ovTokenService.checkIfTokenExists(sessionAtomicReference.get().get_id(), userId)){
+        if(!ovTokenService.checkIfTokenExists(userId, sessionAtomicReference.get().get_id())){
             ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token);
         }
 
