@@ -98,6 +98,7 @@ public class SessionService {
 
     @Transactional
     public Response<ConnectionCreateResponse> createConnection(String userName, String sessionId, HttpServletResponse response) throws OpenViduJavaClientException, OpenViduHttpException {
+        log.info("Create Connection :: {}", sessionId);
         // 1. 세션 인원 검사
         Session session = Optional.ofNullable(openViduService.getSession(sessionId)).orElseThrow(SessionNotExistException::new);
         com.ssafy.meshroom.backend.domain.session.domain.Session meshSession = sessionRepository.findBySessionId(sessionId).orElseThrow(SessionNotExistException::new);
@@ -136,7 +137,6 @@ public class SessionService {
             userId = SecurityContextHolder.getContext().getAuthentication().getName();
         }
 
-        log.info("userId : {}", userId);
 
         if (isMain.get()) {
             // 3-1. 유저 jwtToken 발행
@@ -152,19 +152,17 @@ public class SessionService {
                 .build();
         Connection connection = session.createConnection(connectionProperties);
         String token = connection.getToken(); // Send this string to the client side
-        log.info("OV Token : " + token);
+
+        // 4. user 컬렉션과 token 컬렉션에 관계 추가
+        if(!ovTokenService.checkIfTokenExists(sessionAtomicReference.get().get_id(), userId)){
+            ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token);
+        }
+
         if(isMain.get()){
             simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + sessionId, getSessionInfo(sessionId).getResult());
         }else{
             String mainSessionId = sessionAtomicReference.get().getMainSession();
             simpMessagingTemplate.convertAndSend("/subscribe/sessions/" + mainSessionId, getSessionInfo(mainSessionId).getResult());
-        }
-
-        // 4. user 컬렉션과 token 컬렉션에 관계 추가
-//        if (SecurityContextHolder.getContext().getAuthentication() instanceof AnonymousAuthenticationToken)
-        if(!ovTokenService.checkIfTokenExists(sessionAtomicReference.get().get_id(), userId)){
-            ovTokenService.save(sessionAtomicReference.get().get_id(), userId, token);
-            log.info("ovt save");
         }
 
         return new Response<ConnectionCreateResponse>(true, 2010L, "SUCCESS"
