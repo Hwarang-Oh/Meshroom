@@ -29,7 +29,17 @@ const groups = computed(() => {
 /**
  * TODO : Team Leader는 Contents가 종료되면, 종료 Signal을 진행자에게 보낸다.
  */
-const finishContents = () => {}
+const finishContents = async () => {
+  try {
+    const response = await contentsAPI.finishContents()
+    if (response.data.isSuccess) {
+      console.log('우리 Team은 Contents를 종료했어요!')
+      console.log(response.data)
+    }
+  } catch (error) {
+    console.error('Error Finishing Contents', error)
+  }
+}
 
 /**
  * TODO : MushroomGrow Contents에 대한 Socket 연결
@@ -49,7 +59,10 @@ onMounted(() => {
 <template>
   <v-container fluid class="main-container">
     <!-- * Top Side : 현재 Game의 진행에 대한 정보를 나타내는 Status Bar -->
-    <StatusBar class="top-container" title="Game Info" status="In Progress" />
+    <div class="top-container d-flex align-center justify-space-between">
+      <StatusBar class="status-bar" title="Game Info" status="In Progress" />
+      <v-btn color="red" @click="finishContents">Finish</v-btn>
+    </div>
 
     <!-- * Bottom Size : Left -> MainMushroom , Right -> GroupMushrooms -->
     <v-row class="bottom-container">

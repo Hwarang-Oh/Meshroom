@@ -13,7 +13,7 @@ export default {
     return axios.get(`${API_URL}/contents/reload`).then(success).catch(failure)
   },
   finishContents(success, failure) {
-    return axios.get(`${API_URL}/contents/finish`).then(success).catch(failure)
+    return axios.post(`${API_URL}/contents/finish`).then(success).catch(failure)
   },
   // 진실 혹은 거짓 관련 API
   createStatements(sessionId, statesObject, success, failure) {
