@@ -7,6 +7,8 @@ import ListItem from './_1ListItem.vue'
 const contentsStore = useContentsStore()
 const groupedContents = computed(() => contentsStore.getGroupedContents)
 
+// console.log(category.items)
+
 const pickContents = (item) => {
   if (item.isActive) {
     contentsStore.setPickedContents(item)

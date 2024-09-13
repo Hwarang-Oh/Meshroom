@@ -92,6 +92,7 @@ export const useContentsStore = defineStore('contents', {
   getters: {
     getContents: (state) => state.contents,
     getGroupedContents(state) {
+      console.log(state.contents)
       const grouped = {}
       state.contents.forEach((content) => {
         if (!grouped[content.category]) {
